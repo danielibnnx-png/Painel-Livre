@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -8,74 +8,99 @@
 <style>
 body {
     margin: 0;
-    padding: 20px;
-    background: #111;
+    padding: 15px;
+    background: #080808;
     color: white;
     font-family: Arial, sans-serif;
 }
 
 h1 {
     text-align: center;
+    font-size: 25px;
 }
 
 .aviso {
     text-align: center;
     color: #ffd54a;
-    font-size: 13px;
+    font-size: 12px;
     margin-bottom: 20px;
 }
 
-.candidato {
-    background: #222;
-    border-radius: 15px;
+.card {
+    background: #191919;
+    border-radius: 16px;
     padding: 15px;
-    margin: 12px auto;
-    max-width: 500px;
+    margin-bottom: 13px;
+    border-left: 6px solid var(--cor);
+}
+
+.topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nome {
-    font-size: 21px;
+    font-size: 19px;
     font-weight: bold;
 }
 
 .votos {
-    font-size: 32px;
-    margin: 10px 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.barra-fundo {
+    height: 16px;
+    background: #3a3a3a;
+    border-radius: 20px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.barra {
+    height: 100%;
+    background: var(--cor);
+    border-radius: 20px;
+    transition: width .3s;
+}
+
+.botoes {
+    margin-top: 12px;
 }
 
 button {
-    width: 65px;
-    height: 50px;
-    font-size: 26px;
+    width: 58px;
+    height: 45px;
     border: none;
     border-radius: 10px;
-    margin-right: 8px;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    margin-right: 7px;
 }
 
 .menos {
-    background: #e53935;
-    color: white;
+    background: #c62828;
 }
 
 .mais {
-    background: #18c964;
-    color: white;
+    background: #159447;
 }
 
 #zerar {
     display: block;
-    width: 180px;
     margin: 25px auto;
+    width: 180px;
     background: #555;
-    color: white;
-    font-size: 18px;
+    font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>CONTROLE DO PAINEL</h1>
+<h1>🎛️ CONTROLE DO PAINEL</h1>
 
 <div class="aviso">
 SIMULAÇÃO / RESULTADOS FICTÍCIOS
@@ -85,97 +110,188 @@ SIMULAÇÃO / RESULTADOS FICTÍCIOS
 
 <button id="zerar" onclick="zerar()">ZERAR TUDO</button>
 
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
 <script>
 
-let resultados = JSON.parse(
-    localStorage.getItem("resultados")
-) || {
+const firebaseConfig = {
+    apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
+    authDomain: "painel-livre.firebaseapp.com",
+    databaseURL: "https://painel-livre-default-rtdb.firebaseio.com",
+    projectId: "painel-livre",
+    storageBucket: "painel-livre.firebasestorage.app",
+    messagingSenderId: "997775064382",
+    appId: "1:997775064382:web:bcb4fd836efbf963a2406f"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const banco = firebase.database();
+
+const resultadosRef =
+    banco.ref("resultados");
+
+
+const nomes = {
+    lula: {
+        nome: "Lula",
+        cor: "#e53935"
+    },
+
+    flavio: {
+        nome: "Flávio Bolsonaro",
+        cor: "#18a957"
+    },
+
+    renan: {
+        nome: "Renan Santos",
+        cor: "#ff8a00"
+    },
+
+    marcal: {
+        nome: "Pablo Marçal",
+        cor: "#1687d9"
+    }
+};
+
+
+let resultados = {
     lula: 0,
     flavio: 0,
     renan: 0,
     marcal: 0
 };
 
-const nomes = {
-    lula: "Lula",
-    flavio: "Flávio Bolsonaro",
-    renan: "Renan Santos",
-    marcal: "Pablo Marçal"
-};
 
-function salvar() {
-    localStorage.setItem(
-        "resultados",
-        JSON.stringify(resultados)
-    );
-}
+/* Recebe os resultados do Firebase */
 
-function alterar(nome, valor) {
+resultadosRef.on("value", function(snapshot) {
 
-    resultados[nome] += valor;
-
-    if (resultados[nome] < 0) {
-        resultados[nome] = 0;
+    if (snapshot.exists()) {
+        resultados = snapshot.val();
     }
 
-    salvar();
     mostrar();
-}
 
-function zerar() {
+});
 
-    if (!confirm("Zerar todos os resultados?")) {
-        return;
+
+/* Altera um resultado */
+
+function alterar(id, valor) {
+
+    let novo =
+        Number(resultados[id] || 0) + valor;
+
+    if (novo < 0) {
+        novo = 0;
     }
 
-    resultados = {
-        lula: 0,
-        flavio: 0,
-        renan: 0,
-        marcal: 0
-    };
+    resultados[id] = novo;
 
-    salvar();
-    mostrar();
+    resultadosRef.set(resultados);
+
 }
+
+
+/* Mostra o controle */
 
 function mostrar() {
 
+    let total = 0;
+
+    for (let id in nomes) {
+        total += Number(resultados[id] || 0);
+    }
+
     let html = "";
 
-    for (let nome in resultados) {
+    for (let id in nomes) {
+
+        let candidato = nomes[id];
+
+        let votos =
+            Number(resultados[id] || 0);
+
+        let porcentagem =
+            total > 0
+            ? (votos / total) * 100
+            : 0;
 
         html += `
-        <div class="candidato">
 
-            <div class="nome">
-                ${nomes[nome]}
+        <div
+            class="card"
+            style="--cor:${candidato.cor}"
+        >
+
+            <div class="topo">
+
+                <div class="nome">
+                    ${candidato.nome}
+                </div>
+
+                <div class="votos">
+                    ${votos.toLocaleString("pt-BR")}
+                </div>
+
             </div>
 
-            <div class="votos">
-                ${resultados[nome].toLocaleString("pt-BR")}
+            <div class="barra-fundo">
+
+                <div
+                    class="barra"
+                    style="width:${porcentagem}%"
+                ></div>
+
             </div>
 
-            <button
-                class="menos"
-                onclick="alterar('${nome}', -1)">
-                −
-            </button>
+            <div class="botoes">
 
-            <button
-                class="mais"
-                onclick="alterar('${nome}', 1)">
-                +
-            </button>
+                <button
+                    class="menos"
+                    onclick="alterar('${id}', -1)"
+                >
+                    −
+                </button>
+
+                <button
+                    class="mais"
+                    onclick="alterar('${id}', 1)"
+                >
+                    +
+                </button>
+
+            </div>
 
         </div>
+
         `;
     }
 
     document.getElementById("painel").innerHTML = html;
 }
 
-mostrar();
+
+/* Zera os resultados */
+
+function zerar() {
+
+    if (!confirm("Tem certeza que deseja zerar tudo?")) {
+        return;
+    }
+
+    resultadosRef.set({
+        lula: 0,
+        flavio: 0,
+        renan: 0,
+        marcal: 0
+    });
+
+}
 
 </script>
 
