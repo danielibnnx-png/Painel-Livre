@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -6,6 +6,10 @@
 <title>Controle do Painel</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 15px;
@@ -17,6 +21,7 @@ body {
 h1 {
     text-align: center;
     font-size: 25px;
+    margin-bottom: 5px;
 }
 
 .aviso {
@@ -30,8 +35,9 @@ h1 {
     background: #191919;
     border-radius: 16px;
     padding: 15px;
-    margin-bottom: 13px;
+    margin-bottom: 14px;
     border-left: 6px solid var(--cor);
+    box-shadow: 0 4px 15px rgba(0,0,0,.35);
 }
 
 .topo {
@@ -51,10 +57,10 @@ h1 {
 }
 
 .barra-fundo {
-    height: 16px;
+    height: 17px;
     background: #3a3a3a;
     border-radius: 20px;
-    margin-top: 10px;
+    margin-top: 11px;
     overflow: hidden;
 }
 
@@ -65,19 +71,26 @@ h1 {
     transition: width .3s;
 }
 
+.porcentagem {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
 .botoes {
     margin-top: 12px;
+    display: flex;
+    gap: 8px;
 }
 
 button {
-    width: 58px;
-    height: 45px;
+    width: 60px;
+    height: 46px;
     border: none;
     border-radius: 10px;
     color: white;
     font-size: 25px;
     font-weight: bold;
-    margin-right: 7px;
 }
 
 .menos {
@@ -86,6 +99,10 @@ button {
 
 .mais {
     background: #159447;
+}
+
+button:active {
+    transform: scale(.94);
 }
 
 #zerar {
@@ -111,7 +128,6 @@ SIMULAÇÃO / RESULTADOS FICTÍCIOS
 <button id="zerar" onclick="zerar()">ZERAR TUDO</button>
 
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
@@ -131,20 +147,19 @@ firebase.initializeApp(firebaseConfig);
 
 const banco = firebase.database();
 
-const resultadosRef =
-    banco.ref("resultados");
+const resultadosRef = banco.ref("resultados");
 
 
-const nomes = {
+const candidatos = {
+
     lula: {
         nome: "Lula",
         cor: "#e53935"
     },
 
     flavio: {
-    nome: "Flávio Bolsonaro",
-    cor: "#ffffff"
-}
+        nome: "Flávio Bolsonaro",
+        cor: "#ffffff"
     },
 
     renan: {
@@ -156,6 +171,7 @@ const nomes = {
         nome: "Pablo Marçal",
         cor: "#1687d9"
     }
+
 };
 
 
@@ -167,8 +183,6 @@ let resultados = {
 };
 
 
-/* Recebe os resultados do Firebase */
-
 resultadosRef.on("value", function(snapshot) {
 
     if (snapshot.exists()) {
@@ -179,8 +193,6 @@ resultadosRef.on("value", function(snapshot) {
 
 });
 
-
-/* Altera um resultado */
 
 function alterar(id, valor) {
 
@@ -198,26 +210,24 @@ function alterar(id, valor) {
 }
 
 
-/* Mostra o controle */
-
 function mostrar() {
 
     let total = 0;
 
-    for (let id in nomes) {
+    for (let id in candidatos) {
         total += Number(resultados[id] || 0);
     }
 
     let html = "";
 
-    for (let id in nomes) {
+    for (let id in candidatos) {
 
-        let candidato = nomes[id];
+        const candidato = candidatos[id];
 
-        let votos =
+        const votos =
             Number(resultados[id] || 0);
 
-        let porcentagem =
+        const porcentagem =
             total > 0
             ? (votos / total) * 100
             : 0;
@@ -250,6 +260,10 @@ function mostrar() {
 
             </div>
 
+            <div class="porcentagem">
+                ${porcentagem.toFixed(1)}%
+            </div>
+
             <div class="botoes">
 
                 <button
@@ -274,14 +288,13 @@ function mostrar() {
     }
 
     document.getElementById("painel").innerHTML = html;
+
 }
 
 
-/* Zera os resultados */
-
 function zerar() {
 
-    if (!confirm("Tem certeza que deseja zerar tudo?")) {
+    if (!confirm("Tem certeza que deseja zerar todos os resultados?")) {
         return;
     }
 
