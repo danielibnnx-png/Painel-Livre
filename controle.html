@@ -16,26 +16,25 @@ body {
 
 h1 {
     text-align: center;
-    margin-bottom: 5px;
 }
 
 .aviso {
     text-align: center;
     color: #ffd54a;
     font-size: 13px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .candidato {
     background: #222;
     border-radius: 15px;
-    padding: 18px;
-    margin: 15px auto;
+    padding: 15px;
+    margin: 12px auto;
     max-width: 500px;
 }
 
 .nome {
-    font-size: 22px;
+    font-size: 21px;
     font-weight: bold;
 }
 
@@ -47,15 +46,10 @@ h1 {
 button {
     width: 65px;
     height: 50px;
-    font-size: 28px;
+    font-size: 26px;
     border: none;
     border-radius: 10px;
     margin-right: 8px;
-}
-
-.mais {
-    background: #18c964;
-    color: white;
 }
 
 .menos {
@@ -63,13 +57,18 @@ button {
     color: white;
 }
 
+.mais {
+    background: #18c964;
+    color: white;
+}
+
 #zerar {
     display: block;
     width: 180px;
-    margin: 30px auto;
+    margin: 25px auto;
     background: #555;
     color: white;
-    font-size: 17px;
+    font-size: 18px;
 }
 </style>
 </head>
@@ -86,27 +85,16 @@ SIMULAÇÃO / RESULTADOS FICTÍCIOS
 
 <button id="zerar" onclick="zerar()">ZERAR TUDO</button>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
 <script>
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
-    authDomain: "painel-livre.firebaseapp.com",
-    databaseURL: "https://painel-livre-default-rtdb.firebaseio.com",
-    projectId: "painel-livre",
-    storageBucket: "painel-livre.firebasestorage.app",
-    messagingSenderId: "997775064382",
-    appId: "1:997775064382:web:bcb4fd836efbf963a2406f"
+let resultados = JSON.parse(
+    localStorage.getItem("resultados")
+) || {
+    lula: 0,
+    flavio: 0,
+    renan: 0,
+    marcal: 0
 };
-
-firebase.initializeApp(firebaseConfig);
-
-const banco = firebase.database();
-
-const resultadosRef = banco.ref("resultados");
 
 const nomes = {
     lula: "Lula",
@@ -115,36 +103,47 @@ const nomes = {
     marcal: "Pablo Marçal"
 };
 
-let resultados = {
-    lula: 0,
-    flavio: 0,
-    renan: 0,
-    marcal: 0
-};
+function salvar() {
+    localStorage.setItem(
+        "resultados",
+        JSON.stringify(resultados)
+    );
+}
 
+function alterar(nome, valor) {
 
-/* Recebe os dados do Firebase */
+    resultados[nome] += valor;
 
-resultadosRef.on("value", function(snapshot) {
-
-    if (snapshot.exists()) {
-        resultados = snapshot.val();
+    if (resultados[nome] < 0) {
+        resultados[nome] = 0;
     }
 
+    salvar();
     mostrar();
+}
 
-});
+function zerar() {
 
+    if (!confirm("Zerar todos os resultados?")) {
+        return;
+    }
 
-/* Mostra os candidatos */
+    resultados = {
+        lula: 0,
+        flavio: 0,
+        renan: 0,
+        marcal: 0
+    };
+
+    salvar();
+    mostrar();
+}
 
 function mostrar() {
 
     let html = "";
 
-    for (let nome in nomes) {
-
-        let votos = Number(resultados[nome] || 0);
+    for (let nome in resultados) {
 
         html += `
         <div class="candidato">
@@ -154,7 +153,7 @@ function mostrar() {
             </div>
 
             <div class="votos">
-                ${votos.toLocaleString("pt-BR")}
+                ${resultados[nome].toLocaleString("pt-BR")}
             </div>
 
             <button
@@ -176,40 +175,7 @@ function mostrar() {
     document.getElementById("painel").innerHTML = html;
 }
 
-
-/* Altera os votos */
-
-function alterar(nome, valor) {
-
-    let novoValor =
-        Number(resultados[nome] || 0) + valor;
-
-    if (novoValor < 0) {
-        novoValor = 0;
-    }
-
-    resultados[nome] = novoValor;
-
-    resultadosRef.set(resultados);
-}
-
-
-/* Zera tudo */
-
-function zerar() {
-
-    if (!confirm("Tem certeza que deseja zerar tudo?")) {
-        return;
-    }
-
-    resultadosRef.set({
-        lula: 0,
-        flavio: 0,
-        renan: 0,
-        marcal: 0
-    });
-
-}
+mostrar();
 
 </script>
 
