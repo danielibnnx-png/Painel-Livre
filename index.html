@@ -1,137 +1,22 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Simulação</title>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-<style>
-body {
-  margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-
-h1 {
-  margin: 20px 0 5px;
-  font-size: 28px;
-}
-
-.aviso {
-  color: #ffd54a;
-  font-size: 13px;
-  margin-bottom: 20px;
-}
-
-.painel {
-  max-width: 600px;
-  margin: auto;
-  padding: 10px;
-}
-
-.candidato {
-  background: #222;
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-.nome {
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.votos {
-  font-size: 35px;
-  margin: 10px;
-}
-
-button {
-  font-size: 25px;
-  width: 60px;
-  height: 50px;
-  margin: 5px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.mais {
-  background: #18c964;
-  color: white;
-}
-
-.menos {
-  background: #e53935;
-  color: white;
-}
-</style>
-</head>
-
-<body>
-
-<h1>PAINEL DE RESULTADOS</h1>
-
-<div class="aviso">
-SIMULAÇÃO / RESULTADOS FICTÍCIOS
-</div>
-
-<div class="painel">
-
-  <div class="candidato">
-    <div class="nome">Lula</div>
-    <div class="votos" id="lula">0</div>
-    <button class="menos" onclick="alterar('lula', -1)">−</button>
-    <button class="mais" onclick="alterar('lula', 1)">+</button>
-  </div>
-
-  <div class="candidato">
-    <div class="nome">Flávio Bolsonaro</div>
-    <div class="votos" id="flavio">0</div>
-    <button class="menos" onclick="alterar('flavio', -1)">−</button>
-    <button class="mais" onclick="alterar('flavio', 1)">+</button>
-  </div>
-
-  <div class="candidato">
-    <div class="nome">Renan Santos</div>
-    <div class="votos" id="renan">0</div>
-    <button class="menos" onclick="alterar('renan', -1)">−</button>
-    <button class="mais" onclick="alterar('renan', 1)">+</button>
-  </div>
-
-  <div class="candidato">
-    <div class="nome">Pablo Marçal</div>
-    <div class="votos" id="marcal">0</div>
-    <button class="menos" onclick="alterar('marcal', -1)">−</button>
-    <button class="mais" onclick="alterar('marcal', 1)">+</button>
-  </div>
-
-</div>
-
-<script>
-
-let resultados = {
-  lula: 0,
-  flavio: 0,
-  renan: 0,
-  marcal: 0
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
+  authDomain: "painel-livre.firebaseapp.com",
+  databaseURL: "https://painel-livre-default-rtdb.firebaseio.com",
+  projectId: "painel-livre",
+  storageBucket: "painel-livre.firebasestorage.app",
+  messagingSenderId: "997775064382",
+  appId: "1:997775064382:web:bcb4fd836efbf963a2406f",
+  measurementId: "G-CLM2LTN0GW"
 };
 
-function alterar(nome, valor) {
-
-  resultados[nome] += valor;
-
-  if (resultados[nome] < 0) {
-    resultados[nome] = 0;
-  }
-
-  document.getElementById(nome).innerText =
-    resultados[nome].toLocaleString('pt-BR');
-}
-
-</script>
-
-</body>
-</html>
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
