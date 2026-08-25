@@ -1,1 +1,194 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle - Painel</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+.aviso {
+  text-align: center;
+  color: #ffd54a;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.candidato {
+  background: #222;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 12px auto;
+  max-width: 500px;
+}
+
+.nome {
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.votos {
+  font-size: 32px;
+  margin: 8px 0;
+}
+
+button {
+  width: 65px;
+  height: 50px;
+  font-size: 26px;
+  border: 0;
+  border-radius: 10px;
+  margin-right: 8px;
+}
+
+.menos {
+  background: #e53935;
+  color: white;
+}
+
+.mais {
+  background: #18c964;
+  color: white;
+}
+
+#zerar {
+  display: block;
+  width: 180px;
+  margin: 25px auto;
+  background: #555;
+  color: white;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>CONTROLE DO PAINEL</h1>
+
+<div class="aviso">
+SIMULAÇÃO / RESULTADOS FICTÍCIOS
+</div>
+
+<div id="painel"></div>
+
+<button id="zerar" onclick="zerar()">ZERAR TUDO</button>
+
+<script>
+
+let resultados = JSON.parse(
+  localStorage.getItem("resultados")
+) || {
+  lula: 0,
+  flavio: 0,
+  renan: 0,
+  marcal: 0
+};
+
+const nomes = {
+  lula: "Lula",
+  flavio: "Flávio Bolsonaro",
+  renan: "Renan Santos",
+  marcal: "Pablo Marçal"
+};
+
+function salvar() {
+  localStorage.setItem(
+    "resultados",
+    JSON.stringify(resultados)
+  );
+}
+
+function alterar(nome, valor) {
+
+  resultados[nome] += valor;
+
+  if (resultados[nome] < 0) {
+    resultados[nome] = 0;
+  }
+
+  salvar();
+  mostrar();
+}
+
+function zerar() {
+
+  if (!confirm("Zerar todos os resultados?")) return;
+
+  resultados = {
+    lula: 0,
+    flavio: 0,
+    renan: 0,
+    marcal: 0
+  };
+
+  salvar();
+  mostrar();
+}
+
+function mostrar() {
+
+  let total =
+    resultados.lula +
+    resultados.flavio +
+    resultados.renan +
+    resultados.marcal;
+
+  let html = "";
+
+  for (let nome in resultados) {
+
+    let porcentagem =
+      total > 0
+      ? ((resultados[nome] / total) * 100).toFixed(1)
+      : "0.0";
+
+    html += `
+      <div class="candidato">
+
+        <div class="nome">
+          ${nomes[nome]}
+        </div>
+
+        <div class="votos">
+          ${resultados[nome].toLocaleString("pt-BR")}
+          <small>(${porcentagem}%)</small>
+        </div>
+
+        <button
+          class="menos"
+          onclick="alterar('${nome}', -1)">
+          −
+        </button>
+
+        <button
+          class="mais"
+          onclick="alterar('${nome}', 1)">
+          +
+        </button>
+
+      </div>
+    `;
+  }
+
+  document.getElementById("painel").innerHTML = html;
+}
+
+mostrar();
+
+</script>
+
+</body>
+</html>
