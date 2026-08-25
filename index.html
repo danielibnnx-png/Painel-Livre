@@ -3,42 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Painel de Simulação</title>
 
 <style>
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    background: #0b0b0b;
+    background: #080808;
     color: white;
     font-family: Arial, sans-serif;
 }
 
 .container {
     width: 94%;
-    max-width: 700px;
+    max-width: 760px;
     margin: auto;
-    padding: 18px 0;
+    padding: 18px 0 30px;
 }
 
-h1 {
+.header {
     text-align: center;
-    margin: 5px 0;
-    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 29px;
+    font-weight: 900;
+}
+
+.subtitulo {
+    color: #aaa;
+    margin-top: 5px;
+    font-size: 13px;
 }
 
 .aviso {
-    text-align: center;
-    color: #ffd54a;
-    font-size: 12px;
-    margin: 8px 0 20px;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #332b00;
+    color: #ffd83d;
+    font-size: 11px;
+    font-weight: bold;
 }
 
-.candidato {
-    background: #1d1d1d;
-    border-radius: 16px;
+.card {
+    background: #191919;
+    border-radius: 18px;
     padding: 16px;
-    margin-bottom: 15px;
-    border-left: 5px solid var(--cor);
+    margin-bottom: 14px;
+
+    border-left: 6px solid var(--cor);
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,.45);
 }
 
 .topo {
@@ -47,204 +72,67 @@ h1 {
     align-items: center;
 }
 
-.nome {
-    font-size: 20px;
-    font-weight: bold;
+.identidade {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.numero {
-    font-size: 28px;
+.posicao {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #303030;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-weight: bold;
+    font-size: 17px;
+}
+
+.nome {
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.votos {
+    font-size: 28px;
+    font-weight: 900;
 }
 
 .barra-fundo {
+    width: 100%;
     height: 20px;
-    background: #3a3a3a;
+
+    margin-top: 13px;
+
+    background: #373737;
+
     border-radius: 20px;
-    margin-top: 12px;
+
     overflow: hidden;
 }
 
 .barra {
     height: 100%;
     width: 0%;
+
     background: var(--cor);
+
     border-radius: 20px;
-    transition: width .3s;
+
+    transition: width .35s ease;
 }
 
-.porcentagem {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #bbb;
-}
+.info {
+    display: flex;
+    justify-content: space-between;
 
-.botoes {
-    margin-top: 12px;
-}
+    margin-top: 7px;
 
-button {
-    width: 55px;
-    height: 42px;
-    border: none;
-    border-radius: 9px;
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-    margin-right: 7px;
-}
-
-.menos {
-    background: #d62828;
-}
-
-.mais {
-    background: #159447;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>📊 PAINEL DE RESULTADOS</h1>
-
-<div class="aviso">
-SIMULAÇÃO / RESULTADOS FICTÍCIOS
-</div>
-
-<div id="painel"></div>
-
-</div>
-
-<script>
-
-var candidatos = [
-    {
-        id: "lula",
-        nome: "Lula",
-        cor: "#159447",
-        votos: 0
-    },
-    {
-        id: "flavio",
-        nome: "Flávio Bolsonaro",
-        cor: "#1687d9",
-        votos: 0
-    },
-    {
-        id: "renan",
-        nome: "Renan Santos",
-        cor: "#ff8a00",
-        votos: 0
-    },
-    {
-        id: "marcal",
-        nome: "Pablo Marçal",
-        cor: "#9b59ff",
-        votos: 0
-    }
-];
-
-function alterar(indice, valor) {
-
-    candidatos[indice].votos += valor;
-
-    if (candidatos[indice].votos < 0) {
-        candidatos[indice].votos = 0;
-    }
-
-    mostrar();
-}
-
-function mostrar() {
-
-    var lista = candidatos.slice();
-
-    lista.sort(function(a, b) {
-        return b.votos - a.votos;
-    });
-
-    var total = 0;
-
-    for (var i = 0; i < lista.length; i++) {
-        total += lista[i].votos;
-    }
-
-    var html = "";
-
-    for (var i = 0; i < lista.length; i++) {
-
-        var pessoa = lista[i];
-
-        var porcentagem = total > 0
-            ? (pessoa.votos / total) * 100
-            : 0;
-
-        var indiceOriginal =
-            candidatos.indexOf(pessoa);
-
-        html += `
-        <div
-            class="candidato"
-            style="--cor:${pessoa.cor}"
-        >
-
-            <div class="topo">
-
-                <div class="nome">
-                    ${i + 1}º — ${pessoa.nome}
-                </div>
-
-                <div class="numero">
-                    ${pessoa.votos.toLocaleString("pt-BR")}
-                </div>
-
-            </div>
-
-            <div class="barra-fundo">
-
-                <div
-                    class="barra"
-                    style="width:${porcentagem}%"
-                ></div>
-
-            </div>
-
-            <div class="porcentagem">
-                ${porcentagem.toFixed(1)}%
-            </div>
-
-            <div class="botoes">
-
-                <button
-                    class="menos"
-                    onclick="alterar(${indiceOriginal}, -1)"
-                >
-                    −
-                </button>
-
-                <button
-                    class="mais"
-                    onclick="alterar(${indiceOriginal}, 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-        `;
-    }
-
-    document.getElementById("painel").innerHTML = html;
-}
-
-mostrar();
-
-</script>
-
-</body>
-</html>
+    color: #aaa;
+    font-size: 
