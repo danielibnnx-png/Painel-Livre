@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Painel de Simulação</title>
 
 <style>
@@ -10,102 +10,117 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
     background: #080808;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .container {
-    width: 94%;
-    max-width: 760px;
-    margin: auto;
-    padding: 18px 0 30px;
+    width: 100%;
+    padding: 10px 10px 18px;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .header h1 {
     margin: 0;
-    font-size: 29px;
+    font-size: 25px;
     font-weight: 900;
+    line-height: 1.1;
 }
 
 .subtitulo {
+    margin-top: 3px;
     color: #aaa;
-    margin-top: 5px;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .aviso {
     display: inline-block;
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 20px;
+    margin-top: 7px;
+    padding: 5px 10px;
+    border-radius: 15px;
     background: #332b00;
     color: #ffd83d;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
 }
 
 .card {
-    background: #191919;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 14px;
-    border-left: 6px solid var(--cor);
-    box-shadow: 0 5px 18px rgba(0,0,0,.45);
+    width: 100%;
+    background: #181818;
+    border-radius: 14px;
+    padding: 13px;
+    margin-bottom: 10px;
+    border-left: 5px solid var(--cor);
+    box-shadow: 0 3px 12px rgba(0,0,0,.45);
 }
 
 .topo {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .identidade {
     display: flex;
     align-items: center;
-    gap: 10px;
+    min-width: 0;
+    gap: 8px;
 }
 
 .posicao {
-    width: 38px;
-    height: 38px;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: #303030;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 17px;
+    font-size: 15px;
+    font-weight: 900;
 }
 
 .nome {
-    font-size: 19px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .votos {
-    font-size: 28px;
+    flex-shrink: 0;
+    font-size: 27px;
     font-weight: 900;
 }
 
 .barra-fundo {
     width: 100%;
-    height: 20px;
-    margin-top: 13px;
-    background: #373737;
+    height: 24px;
+    margin-top: 10px;
+    background: #383838;
     border-radius: 20px;
     overflow: hidden;
 }
 
 .barra {
     height: 100%;
+    min-width: 0;
     background: var(--cor);
     border-radius: 20px;
     transition: width .35s ease;
@@ -114,16 +129,44 @@ body {
 .info {
     display: flex;
     justify-content: space-between;
-    margin-top: 7px;
+    margin-top: 5px;
     color: #aaa;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .rodape {
     text-align: center;
-    margin-top: 18px;
-    color: #666;
-    font-size: 11px;
+    margin-top: 8px;
+    color: #555;
+    font-size: 9px;
+}
+
+@media (max-width: 380px) {
+
+    .container {
+        padding: 8px 8px 14px;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .card {
+        padding: 11px;
+        margin-bottom: 8px;
+    }
+
+    .nome {
+        font-size: 16px;
+    }
+
+    .votos {
+        font-size: 24px;
+    }
+
+    .barra-fundo {
+        height: 21px;
+    }
 }
 </style>
 </head>
@@ -154,25 +197,45 @@ body {
 
 </div>
 
+
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
 <script>
 
 const firebaseConfig = {
+
     apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
+
     authDomain: "painel-livre.firebaseapp.com",
-    databaseURL: "https://painel-livre-default-rtdb.firebaseio.com",
+
+    databaseURL:
+        "https://painel-livre-default-rtdb.firebaseio.com",
+
     projectId: "painel-livre",
-    storageBucket: "painel-livre.firebasestorage.app",
-    messagingSenderId: "997775064382",
-    appId: "1:997775064382:web:bcb4fd836efbf963a2406f"
+
+    storageBucket:
+        "painel-livre.firebasestorage.app",
+
+    messagingSenderId:
+        "997775064382",
+
+    appId:
+        "1:997775064382:web:bcb4fd836efbf963a2406f"
+
 };
+
 
 firebase.initializeApp(firebaseConfig);
 
-const banco = firebase.database();
-const resultadosRef = banco.ref("resultados");
+
+const banco =
+    firebase.database();
+
+
+const resultadosRef =
+    banco.ref("resultados");
+
 
 const candidatos = {
 
@@ -183,124 +246,4 @@ const candidatos = {
 
     flavio: {
         nome: "Flávio Bolsonaro",
-        cor: "#ffffff"
-    },
-
-    renan: {
-        nome: "Renan Santos",
-        cor: "#ff8a00"
-    },
-
-    marcal: {
-        nome: "Pablo Marçal",
-        cor: "#1687d9"
-    }
-
-};
-
-resultadosRef.on("value", function(snapshot) {
-
-    let resultados = snapshot.val() || {
-        lula: 0,
-        flavio: 0,
-        renan: 0,
-        marcal: 0
-    };
-
-    mostrar(resultados);
-});
-
-function mostrar(resultados) {
-
-    let lista = [];
-
-    for (let id in candidatos) {
-
-        lista.push({
-            id: id,
-            nome: candidatos[id].nome,
-            cor: candidatos[id].cor,
-            votos: Number(resultados[id] || 0)
-        });
-
-    }
-
-    lista.sort(function(a,b) {
-        return b.votos - a.votos;
-    });
-
-    let total = 0;
-
-    lista.forEach(function(candidato) {
-        total += candidato.votos;
-    });
-
-    let html = "";
-
-    lista.forEach(function(candidato, index) {
-
-        let porcentagem =
-            total > 0
-            ? candidato.votos / total * 100
-            : 0;
-
-        html += `
-
-        <div
-            class="card"
-            style="--cor:${candidato.cor}"
-        >
-
-            <div class="topo">
-
-                <div class="identidade">
-
-                    <div class="posicao">
-                        ${index + 1}º
-                    </div>
-
-                    <div class="nome">
-                        ${candidato.nome}
-                    </div>
-
-                </div>
-
-                <div class="votos">
-                    ${candidato.votos.toLocaleString("pt-BR")}
-                </div>
-
-            </div>
-
-            <div class="barra-fundo">
-
-                <div
-                    class="barra"
-                    style="width:${porcentagem}%"
-                ></div>
-
-            </div>
-
-            <div class="info">
-
-                <span>
-                    Participação
-                </span>
-
-                <span>
-                    ${porcentagem.toFixed(1)}%
-                </span>
-
-            </div>
-
-        </div>
-
-        `;
-    });
-
-    document.getElementById("painel").innerHTML = html;
-}
-
-</script>
-
-</body>
-</html>
+       
