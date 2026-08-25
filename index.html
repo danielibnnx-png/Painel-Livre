@@ -1,13 +1,11 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Painel de Resultados</title>
+<title>Painel de Simulação</title>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -127,7 +125,6 @@ body {
     color: #666;
     font-size: 11px;
 }
-
 </style>
 </head>
 
@@ -157,49 +154,25 @@ body {
 
 </div>
 
-
-<!-- FIREBASE -->
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
 
 <script>
 
 const firebaseConfig = {
-
     apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
-
     authDomain: "painel-livre.firebaseapp.com",
-
-    databaseURL:
-    "https://painel-livre-default-rtdb.firebaseio.com",
-
+    databaseURL: "https://painel-livre-default-rtdb.firebaseio.com",
     projectId: "painel-livre",
-
-    storageBucket:
-    "painel-livre.firebasestorage.app",
-
-    messagingSenderId:
-    "997775064382",
-
-    appId:
-    "1:997775064382:web:bcb4fd836efbf963a2406f"
-
+    storageBucket: "painel-livre.firebasestorage.app",
+    messagingSenderId: "997775064382",
+    appId: "1:997775064382:web:bcb4fd836efbf963a2406f"
 };
-
 
 firebase.initializeApp(firebaseConfig);
 
-
-const banco =
-firebase.database();
-
-
-const resultadosRef =
-banco.ref("resultados");
-
+const banco = firebase.database();
+const resultadosRef = banco.ref("resultados");
 
 const candidatos = {
 
@@ -210,7 +183,7 @@ const candidatos = {
 
     flavio: {
         nome: "Flávio Bolsonaro",
-        cor: "#18a957"
+        cor: "#ffffff"
     },
 
     renan: {
@@ -225,171 +198,4 @@ const candidatos = {
 
 };
 
-
-resultadosRef.on(
-    "value",
-    function(snapshot) {
-
-        let resultados =
-        snapshot.val() || {
-
-            lula: 0,
-
-            flavio: 0,
-
-            renan: 0,
-
-            marcal: 0
-
-        };
-
-
-        mostrar(resultados);
-
-    }
-);
-
-
-function mostrar(resultados) {
-
-    let lista = [];
-
-
-    for (let id in candidatos) {
-
-        lista.push({
-
-            id: id,
-
-            nome:
-            candidatos[id].nome,
-
-            cor:
-            candidatos[id].cor,
-
-            votos:
-            Number(resultados[id] || 0)
-
-        });
-
-    }
-
-
-    lista.sort(
-        function(a,b) {
-
-            return b.votos - a.votos;
-
-        }
-    );
-
-
-    let total = 0;
-
-
-    lista.forEach(
-        function(candidato) {
-
-            total += candidato.votos;
-
-        }
-    );
-
-
-    let html = "";
-
-
-    lista.forEach(
-        function(candidato, index) {
-
-
-            let porcentagem =
-            total > 0
-
-            ? candidato.votos /
-              total * 100
-
-            : 0;
-
-
-            html += `
-
-            <div
-                class="card"
-                style="--cor:${candidato.cor}"
-            >
-
-                <div class="topo">
-
-                    <div class="identidade">
-
-                        <div class="posicao">
-
-                            ${index + 1}º
-
-                        </div>
-
-                        <div class="nome">
-
-                            ${candidato.nome}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="votos">
-
-                        ${candidato.votos
-                        .toLocaleString("pt-BR")}
-
-                    </div>
-
-                </div>
-
-
-                <div class="barra-fundo">
-
-                    <div
-                        class="barra"
-                        style="
-                        width:${porcentagem}%;
-                        "
-                    ></div>
-
-                </div>
-
-
-                <div class="info">
-
-                    <span>
-                        Participação
-                    </span>
-
-                    <span>
-
-                        ${porcentagem
-                        .toFixed(1)}%
-
-                    </span>
-
-                </div>
-
-            </div>
-
-            `;
-
-        }
-    );
-
-
-    document.getElementById(
-        "painel"
-    ).innerHTML = html;
-
-}
-
-</script>
-
-</body>
-</html>
+resultadosRef.on("value",
