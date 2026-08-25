@@ -1,64 +1,137 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Minuto da Verdade — Ranking</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Simulação</title>
+
 <style>
-*{box-sizing:border-box} body{margin:0;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff}
-.wrap{width:100vw;min-height:100vh;padding:28px 18px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.86));}
-.header{text-align:center;margin-bottom:22px}
-.title{font-size:clamp(34px,8vw,70px);font-weight:900;letter-spacing:2px;text-shadow:0 3px 12px #000}
-.sub{font-size:clamp(14px,3.5vw,24px);font-weight:800;letter-spacing:1px}
-.row{display:grid;grid-template-columns:70px 1fr 150px;align-items:center;gap:12px;margin:12px 0;padding:16px 18px;border:2px solid rgba(255,255,255,.45);border-radius:18px;background:rgba(5,5,5,.88);box-shadow:0 8px 25px rgba(0,0,0,.45)}
-.pos{font-size:38px;font-weight:900;text-align:center}.name{font-size:clamp(19px,4.4vw,34px);font-weight:900;line-height:1.05}.pts{text-align:right;font-size:clamp(28px,6vw,46px);font-weight:900}.label{display:block;font-size:12px;letter-spacing:1px;font-weight:800}
-.controls{margin-top:25px;padding:16px;border-radius:16px;background:rgba(0,0,0,.92);border:1px solid rgba(255,255,255,.25)}
-.controls h3{margin:0 0 12px}.ctrl{display:grid;grid-template-columns:1fr 100px 52px 52px;gap:8px;align-items:center;margin:8px 0}.ctrl input{width:100%;padding:10px;border-radius:9px;border:0}.ctrl button{padding:10px;border:0;border-radius:9px;font-weight:900}.save{width:100%;padding:12px;border:0;border-radius:10px;font-weight:900;margin-top:8px}
-.note{text-align:center;font-size:12px;opacity:.8;margin-top:12px}
-@media(max-width:520px){.row{grid-template-columns:45px 1fr 105px;padding:12px 10px}.pos{font-size:28px}.controls{font-size:13px}.ctrl{grid-template-columns:1fr 78px 42px 42px}}
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  margin: 20px 0 5px;
+  font-size: 28px;
+}
+
+.aviso {
+  color: #ffd54a;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.painel {
+  max-width: 600px;
+  margin: auto;
+  padding: 10px;
+}
+
+.candidato {
+  background: #222;
+  border-radius: 15px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.nome {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.votos {
+  font-size: 35px;
+  margin: 10px;
+}
+
+button {
+  font-size: 25px;
+  width: 60px;
+  height: 50px;
+  margin: 5px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.mais {
+  background: #18c964;
+  color: white;
+}
+
+.menos {
+  background: #e53935;
+  color: white;
+}
 </style>
 </head>
-<body>
-<div class="wrap">
-  <div class="header">
-    <div class="title">MINUTO DA VERDADE</div>
-    <div class="sub">🏆 RANKING AO VIVO</div>
-  </div>
-  <div id="board"></div>
 
-  <div class="controls" id="controls">
-    <h3>🎛️ CONTROLE DO RANKING</h3>
-    <div id="form"></div>
-    <button class="save" onclick="save()">ATUALIZAR RANKING</button>
-    <div class="note">Dica: use esta área para testar nomes e pontos. No PRISM, deixe a fonte Web sem bloquear toques.</div>
-  </div>
+<body>
+
+<h1>PAINEL DE RESULTADOS</h1>
+
+<div class="aviso">
+SIMULAÇÃO / RESULTADOS FICTÍCIOS
 </div>
+
+<div class="painel">
+
+  <div class="candidato">
+    <div class="nome">Lula</div>
+    <div class="votos" id="lula">0</div>
+    <button class="menos" onclick="alterar('lula', -1)">−</button>
+    <button class="mais" onclick="alterar('lula', 1)">+</button>
+  </div>
+
+  <div class="candidato">
+    <div class="nome">Flávio Bolsonaro</div>
+    <div class="votos" id="flavio">0</div>
+    <button class="menos" onclick="alterar('flavio', -1)">−</button>
+    <button class="mais" onclick="alterar('flavio', 1)">+</button>
+  </div>
+
+  <div class="candidato">
+    <div class="nome">Renan Santos</div>
+    <div class="votos" id="renan">0</div>
+    <button class="menos" onclick="alterar('renan', -1)">−</button>
+    <button class="mais" onclick="alterar('renan', 1)">+</button>
+  </div>
+
+  <div class="candidato">
+    <div class="nome">Pablo Marçal</div>
+    <div class="votos" id="marcal">0</div>
+    <button class="menos" onclick="alterar('marcal', -1)">−</button>
+    <button class="mais" onclick="alterar('marcal', 1)">+</button>
+  </div>
+
+</div>
+
 <script>
-const defaults=[
- {name:"Lula",points:1474},{name:"Flávio Bolsonaro",points:1264},
- {name:"Renam Santos",points:406},{name:"Pablo Marçal",points:250}
-];
-let data=JSON.parse(localStorage.getItem("mdv")||"null")||defaults;
-function render(){
- data.sort((a,b)=>b.points-a.points);
- board.innerHTML=data.map((x,i)=>`<div class="row">
-   <div class="pos">${i+1}</div><div class="name">${esc(x.name)}</div>
-   <div class="pts">${Number(x.points).toLocaleString("pt-BR")}<span class="label">PONTOS</span></div>
- </div>`).join("");
- form.innerHTML=data.map((x,i)=>`<div class="ctrl">
-   <input id="n${i}" value="${escAttr(x.name)}">
-   <input id="p${i}" type="number" value="${x.points}">
-   <button onclick="chg(${i},1)">+</button><button onclick="chg(${i},-1)">−</button>
- </div>`).join("");
+
+let resultados = {
+  lula: 0,
+  flavio: 0,
+  renan: 0,
+  marcal: 0
+};
+
+function alterar(nome, valor) {
+
+  resultados[nome] += valor;
+
+  if (resultados[nome] < 0) {
+    resultados[nome] = 0;
+  }
+
+  document.getElementById(nome).innerText =
+    resultados[nome].toLocaleString('pt-BR');
 }
-function chg(i,d){let el=document.getElementById("p"+i);el.value=Math.max(0,Number(el.value||0)+d);save(false)}
-function save(show=true){
- data=data.map((x,i)=>({name:document.getElementById("n"+i).value,points:Number(document.getElementById("p"+i).value)||0}));
- localStorage.setItem("mdv",JSON.stringify(data)); render();
-}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function escAttr(s){return esc(s)}
-render();
+
 </script>
+
 </body>
 </html>
