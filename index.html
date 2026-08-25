@@ -3,14 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Painel de Resultados</title>
+<title>Painel de Simulação</title>
 
 <style>
-
 body {
     margin: 0;
-    background: #111;
+    background: #0b0b0b;
     color: white;
     font-family: Arial, sans-serif;
 }
@@ -19,27 +17,28 @@ body {
     width: 94%;
     max-width: 700px;
     margin: auto;
-    padding: 20px 0;
+    padding: 18px 0;
 }
 
 h1 {
     text-align: center;
-    font-size: 28px;
     margin: 5px 0;
+    font-size: 28px;
 }
 
 .aviso {
     text-align: center;
     color: #ffd54a;
     font-size: 12px;
-    margin: 10px 0 20px;
+    margin: 8px 0 20px;
 }
 
 .candidato {
-    background: #222;
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 14px;
+    background: #1d1d1d;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border-left: 5px solid var(--cor);
 }
 
 .topo {
@@ -54,13 +53,13 @@ h1 {
 }
 
 .numero {
-    font-size: 27px;
+    font-size: 28px;
     font-weight: bold;
 }
 
 .barra-fundo {
-    height: 18px;
-    background: #444;
+    height: 20px;
+    background: #3a3a3a;
     border-radius: 20px;
     margin-top: 12px;
     overflow: hidden;
@@ -68,13 +67,39 @@ h1 {
 
 .barra {
     height: 100%;
+    width: 0%;
+    background: var(--cor);
     border-radius: 20px;
+    transition: width .3s;
 }
 
 .porcentagem {
     margin-top: 6px;
     font-size: 14px;
     color: #bbb;
+}
+
+.botoes {
+    margin-top: 12px;
+}
+
+button {
+    width: 55px;
+    height: 42px;
+    border: none;
+    border-radius: 9px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-right: 7px;
+}
+
+.menos {
+    background: #d62828;
+}
+
+.mais {
+    background: #159447;
 }
 
 </style>
@@ -96,48 +121,56 @@ SIMULAÇÃO / RESULTADOS FICTÍCIOS
 
 <script>
 
-var resultados = {
-    lula: 0,
-    flavio: 0,
-    renan: 0,
-    marcal: 0
-};
-
 var candidatos = [
     {
         id: "lula",
         nome: "Lula",
-        cor: "#159447"
+        cor: "#159447",
+        votos: 0
     },
     {
         id: "flavio",
         nome: "Flávio Bolsonaro",
-        cor: "#1687d9"
+        cor: "#1687d9",
+        votos: 0
     },
     {
         id: "renan",
         nome: "Renan Santos",
-        cor: "#ff8a00"
+        cor: "#ff8a00",
+        votos: 0
     },
     {
         id: "marcal",
         nome: "Pablo Marçal",
-        cor: "#9b59ff"
+        cor: "#9b59ff",
+        votos: 0
     }
 ];
 
-function mostrarPainel() {
+function alterar(indice, valor) {
+
+    candidatos[indice].votos += valor;
+
+    if (candidatos[indice].votos < 0) {
+        candidatos[indice].votos = 0;
+    }
+
+    mostrar();
+}
+
+function mostrar() {
 
     var lista = candidatos.slice();
 
     lista.sort(function(a, b) {
-        return resultados[b.id] - resultados[a.id];
+        return b.votos - a.votos;
     });
 
     var total = 0;
 
     for (var i = 0; i < lista.length; i++) {
-        total += resultados[lista[i].id];
+        total += lista[i].votos;
     }
 
     var html = "";
@@ -146,56 +179,70 @@ function mostrarPainel() {
 
         var pessoa = lista[i];
 
-        var votos = resultados[pessoa.id];
+        var porcentagem = total > 0
+            ? (pessoa.votos / total) * 100
+            : 0;
 
-        var porcentagem = 0;
+        var indiceOriginal =
+            candidatos.indexOf(pessoa);
 
-        if (total > 0) {
-            porcentagem = (votos / total) * 100;
-        }
+        html += `
+        <div
+            class="candidato"
+            style="--cor:${pessoa.cor}"
+        >
 
-        html +=
-        '<div class="candidato">' +
+            <div class="topo">
 
-            '<div class="topo">' +
+                <div class="nome">
+                    ${i + 1}º — ${pessoa.nome}
+                </div>
 
-                '<div class="nome">' +
-                    (i + 1) +
-                    'º — ' +
-                    pessoa.nome +
-                '</div>' +
+                <div class="numero">
+                    ${pessoa.votos.toLocaleString("pt-BR")}
+                </div>
 
-                '<div class="numero">' +
-                    votos.toLocaleString("pt-BR") +
-                '</div>' +
+            </div>
 
-            '</div>' +
+            <div class="barra-fundo">
 
-            '<div class="barra-fundo">' +
+                <div
+                    class="barra"
+                    style="width:${porcentagem}%"
+                ></div>
 
-                '<div class="barra" ' +
-                'style="width:' +
-                porcentagem +
-                '%;background:' +
-                pessoa.cor +
-                ';">' +
+            </div>
 
-                '</div>' +
+            <div class="porcentagem">
+                ${porcentagem.toFixed(1)}%
+            </div>
 
-            '</div>' +
+            <div class="botoes">
 
-            '<div class="porcentagem">' +
-                porcentagem.toFixed(1) +
-                '%' +
-            '</div>' +
+                <button
+                    class="menos"
+                    onclick="alterar(${indiceOriginal}, -1)"
+                >
+                    −
+                </button>
 
-        '</div>';
+                <button
+                    class="mais"
+                    onclick="alterar(${indiceOriginal}, 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+        `;
     }
 
     document.getElementById("painel").innerHTML = html;
 }
 
-mostrarPainel();
+mostrar();
 
 </script>
 
