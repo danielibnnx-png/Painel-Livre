@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -198,4 +198,109 @@ const candidatos = {
 
 };
 
-resultadosRef.on("value",
+resultadosRef.on("value", function(snapshot) {
+
+    let resultados = snapshot.val() || {
+        lula: 0,
+        flavio: 0,
+        renan: 0,
+        marcal: 0
+    };
+
+    mostrar(resultados);
+});
+
+function mostrar(resultados) {
+
+    let lista = [];
+
+    for (let id in candidatos) {
+
+        lista.push({
+            id: id,
+            nome: candidatos[id].nome,
+            cor: candidatos[id].cor,
+            votos: Number(resultados[id] || 0)
+        });
+
+    }
+
+    lista.sort(function(a,b) {
+        return b.votos - a.votos;
+    });
+
+    let total = 0;
+
+    lista.forEach(function(candidato) {
+        total += candidato.votos;
+    });
+
+    let html = "";
+
+    lista.forEach(function(candidato, index) {
+
+        let porcentagem =
+            total > 0
+            ? candidato.votos / total * 100
+            : 0;
+
+        html += `
+
+        <div
+            class="card"
+            style="--cor:${candidato.cor}"
+        >
+
+            <div class="topo">
+
+                <div class="identidade">
+
+                    <div class="posicao">
+                        ${index + 1}º
+                    </div>
+
+                    <div class="nome">
+                        ${candidato.nome}
+                    </div>
+
+                </div>
+
+                <div class="votos">
+                    ${candidato.votos.toLocaleString("pt-BR")}
+                </div>
+
+            </div>
+
+            <div class="barra-fundo">
+
+                <div
+                    class="barra"
+                    style="width:${porcentagem}%"
+                ></div>
+
+            </div>
+
+            <div class="info">
+
+                <span>
+                    Participação
+                </span>
+
+                <span>
+                    ${porcentagem.toFixed(1)}%
+                </span>
+
+            </div>
+
+        </div>
+
+        `;
+    });
+
+    document.getElementById("painel").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
