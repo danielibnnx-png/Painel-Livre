@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Painel de Simulação</title>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -59,11 +57,8 @@ body {
     border-radius: 18px;
     padding: 16px;
     margin-bottom: 14px;
-
     border-left: 6px solid var(--cor);
-
-    box-shadow:
-        0 5px 18px rgba(0,0,0,.45);
+    box-shadow: 0 5px 18px rgba(0,0,0,.45);
 }
 
 .topo {
@@ -81,15 +76,11 @@ body {
 .posicao {
     width: 38px;
     height: 38px;
-
     border-radius: 50%;
-
     background: #303030;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-weight: bold;
     font-size: 17px;
 }
@@ -107,32 +98,251 @@ body {
 .barra-fundo {
     width: 100%;
     height: 20px;
-
     margin-top: 13px;
-
     background: #373737;
-
     border-radius: 20px;
-
     overflow: hidden;
 }
 
 .barra {
     height: 100%;
     width: 0%;
-
     background: var(--cor);
-
     border-radius: 20px;
-
     transition: width .35s ease;
 }
 
 .info {
     display: flex;
     justify-content: space-between;
-
     margin-top: 7px;
-
     color: #aaa;
-    font-size: 
+    font-size: 13px;
+}
+
+.controles {
+    display: flex;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    width: 58px;
+    height: 44px;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menos {
+    background: #c62828;
+}
+
+.mais {
+    background: #159447;
+}
+
+button:active {
+    transform: scale(.94);
+}
+
+.rodape {
+    text-align: center;
+    margin-top: 18px;
+    color: #666;
+    font-size: 11px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>📊 PAINEL DE RESULTADOS</h1>
+
+        <div class="subtitulo">
+            Acompanhamento da simulação
+        </div>
+
+        <div class="aviso">
+            SIMULAÇÃO / RESULTADOS FICTÍCIOS
+        </div>
+
+    </div>
+
+    <div id="painel"></div>
+
+    <div class="rodape">
+        Painel demonstrativo
+    </div>
+
+</div>
+
+<script>
+
+let candidatos = [
+
+    {
+        id: "lula",
+        nome: "Lula",
+        cor: "#e53935",
+        votos: 0
+    },
+
+    {
+        id: "flavio",
+        nome: "Flávio Bolsonaro",
+        cor: "#18a957",
+        votos: 0
+    },
+
+    {
+        id: "renan",
+        nome: "Renan Santos",
+        cor: "#ff8a00",
+        votos: 0
+    },
+
+    {
+        id: "marcal",
+        nome: "Pablo Marçal",
+        cor: "#1687d9",
+        votos: 0
+    }
+
+];
+
+
+function alterar(id, valor) {
+
+    const candidato =
+        candidatos.find(
+            item => item.id === id
+        );
+
+    if (!candidato) return;
+
+    candidato.votos += valor;
+
+    if (candidato.votos < 0) {
+        candidato.votos = 0;
+    }
+
+    mostrar();
+}
+
+
+function mostrar() {
+
+    const lista =
+        [...candidatos].sort(
+            (a, b) =>
+                b.votos - a.votos
+        );
+
+    const total =
+        candidatos.reduce(
+            (soma, candidato) =>
+                soma + candidato.votos,
+            0
+        );
+
+    let html = "";
+
+    lista.forEach(
+        (candidato, index) => {
+
+            const porcentagem =
+                total > 0
+                ? candidato.votos / total * 100
+                : 0;
+
+            html += `
+
+            <div
+                class="card"
+                style="--cor:${candidato.cor}"
+            >
+
+                <div class="topo">
+
+                    <div class="identidade">
+
+                        <div class="posicao">
+                            ${index + 1}º
+                        </div>
+
+                        <div class="nome">
+                            ${candidato.nome}
+                        </div>
+
+                    </div>
+
+                    <div class="votos">
+                        ${candidato.votos.toLocaleString("pt-BR")}
+                    </div>
+
+                </div>
+
+                <div class="barra-fundo">
+
+                    <div
+                        class="barra"
+                        style="width:${porcentagem}%"
+                    ></div>
+
+                </div>
+
+                <div class="info">
+
+                    <span>
+                        Participação
+                    </span>
+
+                    <span>
+                        ${porcentagem.toFixed(1)}%
+                    </span>
+
+                </div>
+
+                <div class="controles">
+
+                    <button
+                        class="menos"
+                        onclick="alterar('${candidato.id}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <button
+                        class="mais"
+                        onclick="alterar('${candidato.id}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+            `;
+        }
+    );
+
+    document.getElementById(
+        "painel"
+    ).innerHTML = html;
+}
+
+mostrar();
+
+</script>
+
+</body>
+</html>
