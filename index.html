@@ -1,11 +1,13 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Simulação</title>
+
+<title>Painel de Resultados</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -106,7 +108,6 @@ body {
 
 .barra {
     height: 100%;
-    width: 0%;
     background: var(--cor);
     border-radius: 20px;
     transition: width .35s ease;
@@ -120,41 +121,13 @@ body {
     font-size: 13px;
 }
 
-.controles {
-    display: flex;
-    gap: 8px;
-    margin-top: 13px;
-}
-
-button {
-    border: none;
-    border-radius: 10px;
-    width: 58px;
-    height: 44px;
-    color: white;
-    font-size: 25px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.menos {
-    background: #c62828;
-}
-
-.mais {
-    background: #159447;
-}
-
-button:active {
-    transform: scale(.94);
-}
-
 .rodape {
     text-align: center;
     margin-top: 18px;
     color: #666;
     font-size: 11px;
 }
+
 </style>
 </head>
 
@@ -184,84 +157,160 @@ button:active {
 
 </div>
 
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+
 <script>
 
-let candidatos = [
+const firebaseConfig = {
 
-    {
-        id: "lula",
+    apiKey: "AIzaSyAhDw8PgOsrxeaDzzPqO_OqlTa9aw8fdk8",
+
+    authDomain: "painel-livre.firebaseapp.com",
+
+    databaseURL:
+    "https://painel-livre-default-rtdb.firebaseio.com",
+
+    projectId: "painel-livre",
+
+    storageBucket:
+    "painel-livre.firebasestorage.app",
+
+    messagingSenderId:
+    "997775064382",
+
+    appId:
+    "1:997775064382:web:bcb4fd836efbf963a2406f"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+
+const banco =
+firebase.database();
+
+
+const resultadosRef =
+banco.ref("resultados");
+
+
+const candidatos = {
+
+    lula: {
         nome: "Lula",
-        cor: "#e53935",
-        votos: 0
+        cor: "#e53935"
     },
 
-    {
-        id: "flavio",
+    flavio: {
         nome: "Flávio Bolsonaro",
-        cor: "#18a957",
-        votos: 0
+        cor: "#18a957"
     },
 
-    {
-        id: "renan",
+    renan: {
         nome: "Renan Santos",
-        cor: "#ff8a00",
-        votos: 0
+        cor: "#ff8a00"
     },
 
-    {
-        id: "marcal",
+    marcal: {
         nome: "Pablo Marçal",
-        cor: "#1687d9",
-        votos: 0
+        cor: "#1687d9"
     }
 
-];
+};
 
 
-function alterar(id, valor) {
+resultadosRef.on(
+    "value",
+    function(snapshot) {
 
-    const candidato =
-        candidatos.find(
-            item => item.id === id
-        );
+        let resultados =
+        snapshot.val() || {
 
-    if (!candidato) return;
+            lula: 0,
 
-    candidato.votos += valor;
+            flavio: 0,
 
-    if (candidato.votos < 0) {
-        candidato.votos = 0;
+            renan: 0,
+
+            marcal: 0
+
+        };
+
+
+        mostrar(resultados);
+
+    }
+);
+
+
+function mostrar(resultados) {
+
+    let lista = [];
+
+
+    for (let id in candidatos) {
+
+        lista.push({
+
+            id: id,
+
+            nome:
+            candidatos[id].nome,
+
+            cor:
+            candidatos[id].cor,
+
+            votos:
+            Number(resultados[id] || 0)
+
+        });
+
     }
 
-    mostrar();
-}
+
+    lista.sort(
+        function(a,b) {
+
+            return b.votos - a.votos;
+
+        }
+    );
 
 
-function mostrar() {
+    let total = 0;
 
-    const lista =
-        [...candidatos].sort(
-            (a, b) =>
-                b.votos - a.votos
-        );
 
-    const total =
-        candidatos.reduce(
-            (soma, candidato) =>
-                soma + candidato.votos,
-            0
-        );
+    lista.forEach(
+        function(candidato) {
+
+            total += candidato.votos;
+
+        }
+    );
+
 
     let html = "";
 
-    lista.forEach(
-        (candidato, index) => {
 
-            const porcentagem =
-                total > 0
-                ? candidato.votos / total * 100
-                : 0;
+    lista.forEach(
+        function(candidato, index) {
+
+
+            let porcentagem =
+            total > 0
+
+            ? candidato.votos /
+              total * 100
+
+            : 0;
+
 
             html += `
 
@@ -275,29 +324,41 @@ function mostrar() {
                     <div class="identidade">
 
                         <div class="posicao">
+
                             ${index + 1}º
+
                         </div>
 
                         <div class="nome">
+
                             ${candidato.nome}
+
                         </div>
 
                     </div>
 
+
                     <div class="votos">
-                        ${candidato.votos.toLocaleString("pt-BR")}
+
+                        ${candidato.votos
+                        .toLocaleString("pt-BR")}
+
                     </div>
 
                 </div>
+
 
                 <div class="barra-fundo">
 
                     <div
                         class="barra"
-                        style="width:${porcentagem}%"
+                        style="
+                        width:${porcentagem}%;
+                        "
                     ></div>
 
                 </div>
+
 
                 <div class="info">
 
@@ -306,41 +367,27 @@ function mostrar() {
                     </span>
 
                     <span>
-                        ${porcentagem.toFixed(1)}%
+
+                        ${porcentagem
+                        .toFixed(1)}%
+
                     </span>
-
-                </div>
-
-                <div class="controles">
-
-                    <button
-                        class="menos"
-                        onclick="alterar('${candidato.id}', -1)"
-                    >
-                        −
-                    </button>
-
-                    <button
-                        class="mais"
-                        onclick="alterar('${candidato.id}', 1)"
-                    >
-                        +
-                    </button>
 
                 </div>
 
             </div>
 
             `;
+
         }
     );
+
 
     document.getElementById(
         "painel"
     ).innerHTML = html;
-}
 
-mostrar();
+}
 
 </script>
 
