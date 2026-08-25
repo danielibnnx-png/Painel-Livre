@@ -1,32 +1,25 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Painel de Simulação</title>
+<title>Painel de Resultados</title>
 
 <style>
 * {
     box-sizing: border-box;
 }
 
-html,
 body {
     margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-}
-
-body {
     background: #080808;
     color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 .container {
     width: 100%;
-    padding: 10px 10px 18px;
+    padding: 10px;
 }
 
 .header {
@@ -38,13 +31,12 @@ body {
     margin: 0;
     font-size: 25px;
     font-weight: 900;
-    line-height: 1.1;
 }
 
 .subtitulo {
-    margin-top: 3px;
     color: #aaa;
     font-size: 12px;
+    margin-top: 3px;
 }
 
 .aviso {
@@ -59,31 +51,26 @@ body {
 }
 
 .card {
-    width: 100%;
     background: #181818;
-    border-radius: 14px;
+    border-radius: 15px;
     padding: 13px;
     margin-bottom: 10px;
     border-left: 5px solid var(--cor);
-    box-shadow: 0 3px 12px rgba(0,0,0,.45);
 }
 
 .topo {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    align-items: center;
 }
 
 .identidade {
     display: flex;
     align-items: center;
-    min-width: 0;
     gap: 8px;
 }
 
 .posicao {
-    flex: 0 0 34px;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -91,27 +78,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
     font-weight: 900;
 }
 
 .nome {
     font-size: 18px;
     font-weight: 900;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .votos {
-    flex-shrink: 0;
     font-size: 27px;
     font-weight: 900;
 }
 
 .barra-fundo {
     width: 100%;
-    height: 24px;
+    height: 23px;
     margin-top: 10px;
     background: #383838;
     border-radius: 20px;
@@ -120,7 +102,6 @@ body {
 
 .barra {
     height: 100%;
-    min-width: 0;
     background: var(--cor);
     border-radius: 20px;
     transition: width .35s ease;
@@ -129,44 +110,53 @@ body {
 .info {
     display: flex;
     justify-content: space-between;
-    margin-top: 5px;
     color: #aaa;
     font-size: 12px;
+    margin-top: 5px;
+}
+
+.controles {
+    display: flex;
+    gap: 8px;
+    margin-top: 9px;
+}
+
+button {
+    border: 0;
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+    border-radius: 9px;
+    width: 48px;
+    height: 38px;
+}
+
+.menos {
+    background: #a52323;
+}
+
+.mais {
+    background: #168b45;
+}
+
+.zerar {
+    display: block;
+    margin: 15px auto 5px;
+    width: 150px;
+    height: 38px;
+    background: #444;
+    font-size: 14px;
+}
+
+button:active {
+    transform: scale(.94);
 }
 
 .rodape {
     text-align: center;
-    margin-top: 8px;
     color: #555;
     font-size: 9px;
-}
-
-@media (max-width: 380px) {
-
-    .container {
-        padding: 8px 8px 14px;
-    }
-
-    .header h1 {
-        font-size: 22px;
-    }
-
-    .card {
-        padding: 11px;
-        margin-bottom: 8px;
-    }
-
-    .nome {
-        font-size: 16px;
-    }
-
-    .votos {
-        font-size: 24px;
-    }
-
-    .barra-fundo {
-        height: 21px;
-    }
+    margin-top: 8px;
 }
 </style>
 </head>
@@ -191,6 +181,10 @@ body {
 
     <div id="painel"></div>
 
+    <button class="zerar" onclick="zerarTudo()">
+        ZERAR TUDO
+    </button>
+
     <div class="rodape">
         Painel demonstrativo
     </div>
@@ -199,7 +193,9 @@ body {
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
 
 <script>
 
@@ -210,18 +206,18 @@ const firebaseConfig = {
     authDomain: "painel-livre.firebaseapp.com",
 
     databaseURL:
-        "https://painel-livre-default-rtdb.firebaseio.com",
+    "https://painel-livre-default-rtdb.firebaseio.com",
 
     projectId: "painel-livre",
 
     storageBucket:
-        "painel-livre.firebasestorage.app",
+    "painel-livre.firebasestorage.app",
 
     messagingSenderId:
-        "997775064382",
+    "997775064382",
 
     appId:
-        "1:997775064382:web:bcb4fd836efbf963a2406f"
+    "1:997775064382:web:bcb4fd836efbf963a2406f"
 
 };
 
@@ -230,11 +226,11 @@ firebase.initializeApp(firebaseConfig);
 
 
 const banco =
-    firebase.database();
+firebase.database();
 
 
 const resultadosRef =
-    banco.ref("resultados");
+banco.ref("resultados");
 
 
 const candidatos = {
@@ -246,4 +242,277 @@ const candidatos = {
 
     flavio: {
         nome: "Flávio Bolsonaro",
-       
+        cor: "#ffffff"
+    },
+
+    renan: {
+        nome: "Renan Santos",
+        cor: "#ff8a00"
+    },
+
+    marcal: {
+        nome: "Pablo Marçal",
+        cor: "#1687d9"
+    }
+
+};
+
+
+let resultados = {
+
+    lula: 0,
+    flavio: 0,
+    renan: 0,
+    marcal: 0
+
+};
+
+
+resultadosRef.on("value", function(snapshot) {
+
+    if (snapshot.exists()) {
+
+        resultados =
+        snapshot.val();
+
+    }
+
+    mostrar();
+
+});
+
+
+function alterar(id, quantidade) {
+
+    let novoValor =
+        Number(resultados[id] || 0)
+        + quantidade;
+
+
+    if (novoValor < 0) {
+
+        novoValor = 0;
+
+    }
+
+
+    resultados[id] =
+        novoValor;
+
+
+    resultadosRef.set(
+        resultados
+    );
+
+}
+
+
+function zerarTudo() {
+
+    if (
+        !confirm(
+            "Tem certeza que deseja zerar todos os resultados?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    resultadosRef.set({
+
+        lula: 0,
+
+        flavio: 0,
+
+        renan: 0,
+
+        marcal: 0
+
+    });
+
+}
+
+
+function mostrar() {
+
+    let lista = [];
+
+
+    for (
+        let id in candidatos
+    ) {
+
+        lista.push({
+
+            id: id,
+
+            nome:
+            candidatos[id].nome,
+
+            cor:
+            candidatos[id].cor,
+
+            votos:
+            Number(
+                resultados[id] || 0
+            )
+
+        });
+
+    }
+
+
+    lista.sort(
+        function(a, b) {
+
+            return b.votos - a.votos;
+
+        }
+    );
+
+
+    let total = 0;
+
+
+    lista.forEach(
+        function(candidato) {
+
+            total +=
+            candidato.votos;
+
+        }
+    );
+
+
+    let html = "";
+
+
+    lista.forEach(
+        function(candidato, index) {
+
+            let porcentagem =
+            total > 0
+
+            ? (
+                candidato.votos /
+                total
+            ) * 100
+
+            : 0;
+
+
+            html += `
+
+            <div
+                class="card"
+                style="--cor:${candidato.cor}"
+            >
+
+                <div class="topo">
+
+                    <div class="identidade">
+
+                        <div class="posicao">
+
+                            ${index + 1}º
+
+                        </div>
+
+                        <div class="nome">
+
+                            ${candidato.nome}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="votos">
+
+                        ${candidato.votos
+                        .toLocaleString("pt-BR")}
+
+                    </div>
+
+                </div>
+
+
+                <div class="barra-fundo">
+
+                    <div
+                        class="barra"
+                        style="
+                        width:${porcentagem}%;
+                        "
+                    ></div>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span>
+                        Participação
+                    </span>
+
+                    <span>
+
+                        ${porcentagem
+                        .toFixed(1)}%
+
+                    </span>
+
+                </div>
+
+
+                <div class="controles">
+
+                    <button
+                        class="menos"
+                        onclick="
+                        alterar(
+                            '${candidato.id}',
+                            -1
+                        )"
+                    >
+
+                        −
+
+                    </button>
+
+
+                    <button
+                        class="mais"
+                        onclick="
+                        alterar(
+                            '${candidato.id}',
+                            1
+                        )"
+                    >
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            `;
+
+        }
+    );
+
+
+    document.getElementById(
+        "painel"
+    ).innerHTML = html;
+
+}
+
+</script>
+
+</body>
+</html>
